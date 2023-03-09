@@ -3,6 +3,9 @@ using dataTransferOlympicGames.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddMemoryCache();
+builder.Services.AddSession();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -27,7 +30,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
+
 app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "custom",
+    pattern: "{controller}/{action}/game-{activeGame}/cat-{activeCat}");
 
 app.MapControllerRoute(
     name: "default",

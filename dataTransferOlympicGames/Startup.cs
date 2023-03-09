@@ -16,6 +16,17 @@ namespace dataTransferOlympicGames
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<CountryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("CountryContext")));
+
+            services.AddMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(60 * 5);
+                options.Cookie.HttpOnly = false;
+                options.Cookie.IsEssential = true;
+            });
+
+            services.AddControllersWithViews();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -37,6 +48,7 @@ namespace dataTransferOlympicGames
             app.UseRouting(); // mark where routing decisions are made
 
             app.UseAuthorization();
+            app.UseSession();
 
             // configure middleware that runs after routing decisions have been made
 

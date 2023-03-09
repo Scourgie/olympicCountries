@@ -1,0 +1,47 @@
+﻿@using dataTransferOlympicGames.Models
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model CountryListViewModel
+@{
+    ViewData["Title"] = "Favorites";
+}
+
+<div class="text-center">
+    <h2>@(String.IsNullOrEmpty(Model.UserName) ? "My" : Model.UserName + "'s") Favorites</h2>
+
+    <form asp-action="Delete" method="post">
+        <a asp-action="Index" asp-controller="Home" class="btn btn-primary" asp-route-activeGame="@Model.ActiveGame" asp-route-activeCat="@Model.ActiveCat">Back to Home Page</a>
+        <a asp-action="Index" asp-controller="Name" class="btn btn-primary">Change Name</a>
+        <button type="submit" class="btn btn-primary">Clear Favorites</button>
+    </form>
+    <br />
+</div>
+
+<div class="row">
+
+    <div class="col-8 offset-2">
+
+        <ul class="list-group">
+            @foreach (Country country in Model.Countries)
+            {
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <img src="~/images/@country.LogoImage" alt="" height="100px" width="200px"/>
+                        </div>
+                        <div class="col-sm-4">
+                            @country.Name
+                        </div>
+                        <div class="col-sm-4">
+                            @country.Game.Name @country.Category.Name
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+
+    </div>
+
+</div>
+

@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using dataTransferOlympicGames.Models
+@{
+    string controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+}
+
+<!DOCTYPE html>
 
 <html>
 <head>
@@ -12,6 +17,27 @@
     <div class="container">
         <header class="text-center text-white">
             <h1 class="bg-primary mt-3 p-3">Olympic Countries</h1>
+
+            @if (TempData.Keys.Contains("message"))
+            {
+                <h4 class="bg-success p-2">@TempData["message"]</h4>
+            }
+
+            @if (controller != "Favorites")
+            {
+                var session = new OlympicSession(Context.Session);
+                int? count = session.GetMyCountryCount();
+
+                @if (count.HasValue)
+                {
+                    <h5 class="bg-info p-2">
+                        <a asp-controller="Favorites" asp-action="Index" class="text-white">
+                            @(String.IsNullOrEmpty(session.GetName()) ? "My " : session.GetName() + "'s ")Favorite Teams</a>
+                        <span class="badge bg-light text-black">@count</span>
+                    </h5>
+                }
+            }
+
         </header>
         <main>
             @RenderBody()

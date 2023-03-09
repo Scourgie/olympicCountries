@@ -1,5 +1,6 @@
 ﻿using dataTransferOlympicGames.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace dataTransferOlympicGames.Controllers
 {
@@ -13,34 +14,44 @@ namespace dataTransferOlympicGames.Controllers
             context = ctx;
         }
 
-        public ViewResult Index(string activeGame = "all", string activeCat = "all")
+        public ViewResult Index(CountryListViewModel model)
         {
 
-            ViewBag.ActiveGame = activeGame;
-            ViewBag.ActiveCat = activeCat;
+            var session = new OlympicSession(HttpContext.Session);
+            session.SetActiveGame(model.ActiveGame);
+            session.SetActiveCat(model.ActiveCat);
 
-            List<Game> games = context.Games.ToList();
-            List<Category> categories = context.Categories.ToList();
+            model.Games = context.Games.ToList();
+            model.Categories = context.Categories.ToList();
 
-            games.Insert(0, new Game { GameID = "all", Name = "All" });
-            categories.Insert(0, new Category { CategoryID = "all", Name = "All" });
-
-            ViewBag.Games = games;
-            ViewBag.Categories = categories;
-
-            IQueryable<Country> query = context.Countries;
-            if (activeGame != "all")
+            IQueryable<Country> query = context.Countries.OrderBy(t => t.Name);
+            if (model.ActiveGame != "all")
             {
-                query = query.Where( t => t.Game.GameID.ToLower() == activeGame.ToLower() );
+                query = query.Where(t => t.Game.GameID.ToLower() == model.ActiveGame.ToLower());
             }
-            if (activeCat != "all")
+            if (model.ActiveCat != "all")
             {
-                query = query.Where( t => t.Category.CategoryID.ToLower() == activeCat.ToLower() );
+                query = query.Where(t => t.Category.CategoryID.ToLower() == model.ActiveCat.ToLower());
             }
+            model.Countries = query.ToList();
 
-            var countries = query.ToList();
-            return View(countries);
+            return View(model);
 
+        }
+
+        public ViewResult Details(string id)
+        {
+            var session = new OlympicSession(HttpContext.Session);
+            var model = new CountryListViewModel
+            {
+                Country = context.Countries
+                    .Include(t => t.Game)
+                    .Include(t => t.Category)
+                    .FirstOrDefault(t => t.CountryID == id) ?? new Country(),
+                ActiveGame = session.GetActiveGame(),
+                ActiveCat = session.GetActiveCat()
+            };
+            return View(model);
         }
 
     }
