@@ -17,14 +17,10 @@ namespace dataTransferOlympicGames.Controllers
         public ViewResult Index(CountryListViewModel model)
         {
 
-            var session = new OlympicSession(HttpContext.Session);
-            session.SetActiveGame(model.ActiveGame);
-            session.SetActiveCat(model.ActiveCat);
-
             model.Games = context.Games.ToList();
             model.Categories = context.Categories.ToList();
 
-            IQueryable<Country> query = context.Countries.OrderBy(t => t.Name);
+            IQueryable<Country> query = context.Countries;
             if (model.ActiveGame != "all")
             {
                 query = query.Where(t => t.Game.GameID.ToLower() == model.ActiveGame.ToLower());
